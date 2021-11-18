@@ -4,41 +4,43 @@ let str = window.location
 let url = new URL(str);
 let id = url.searchParams.get("id");
 
-// Chargement et affichage des données du produit
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!! Fetch !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!! Récupération des données du canapé et affichage !!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 fetch("http://localhost:3000/api/products/" + id)
 .then(function(res) {
-    if (res.ok) {
+    if (res.ok) { // Vérification si des résultats sont présents
       return res.json();
     }
   })
-  .then(function(resultats, id) {
+  .then(function(resultats, id) { // Fonction récupérant les données 
       
     //Affichage informations produit
 
-    let titlePageHTML = document.querySelector('title');
-    titlePageHTML.innerHTML = `${resultats.name}`;
+    let titlePageHTML = document.querySelector('title'); 
+    titlePageHTML.innerHTML = `${resultats.name}`; // Affichage du titre du canapé dans le titre de la page
 
     let imageHTML = document.querySelector('div.item__img');
-    imageHTML.innerHTML = `<img src="${resultats.imageUrl}" alt="${resultats.altTxt}">`;
+    imageHTML.innerHTML = `<img src="${resultats.imageUrl}" alt="${resultats.altTxt}">`; // Affichage de l'image
 
     let titleHTML = document.getElementById('title');
-    titleHTML.innerHTML = `${resultats.name}`;
+    titleHTML.innerHTML = `${resultats.name}`; // Affichage du titre du canapé
 
     let priceHTML = document.getElementById('price');
-    priceHTML.innerHTML = `${resultats.price}`;
+    priceHTML.innerHTML = `${resultats.price}`; // Affichage du prix
 
     let descriptionHTML = document.getElementById('description');
-    descriptionHTML.innerHTML = `${resultats.description}`;
+    descriptionHTML.innerHTML = `${resultats.description}`; // Affichage de la description
+ 
+    let colorsHTML = document.getElementById('colors'); 
 
-    let colorsHTML = document.getElementById('colors');
-
-    for(i = 0; i < resultats.colors.length; i++){
+    for(i = 0; i < resultats.colors.length; i++){ // Affichage des différentes couleurs
         colorsHTML.innerHTML += `<option value="${resultats.colors[i]}">${resultats.colors[i]}</option>`;
     }
-    // Execution fonction addcart et passage en paramètre des informationss produits
 
-    addcart(resultats.name, resultats.imageUrl, resultats.altTxt, resultats.price);
+    listener(resultats.name, resultats.imageUrl, resultats.altTxt, resultats.price); // 
     
 
   })
@@ -55,82 +57,126 @@ fetch("http://localhost:3000/api/products/" + id)
     error.style.lineHeight = "30px";
   }); // Fin Fetch
 
-  // Fonction permettant l'ajout au panier
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!! Fonction listener !!!!!!!!!!!!!!!!!!!!!!
+// !!!!! Ecoute du clique sur le bouton ajouter au panier !!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-function addcart(title, imgSrc, imgAlt, price){
-
-  //Fonction en cas de clique sur Ajouter au Panier
+function listener(name, imageUrl, altTxt, price){
   document.getElementById('addToCart').addEventListener('click', function(e){
     e.preventDefault();
 
-    // Récupération des données saisies par l'utilisateur
-    let colors = document.getElementById('colors').value;
-    let quantityFloat = document.getElementById('quantity').value;
-    let quantity = parseInt(quantityFloat); // Transformation de la quantité en INT au cas ou l'utilisateur saisirait un chiffre à virgule
+    recoveryData(name, imageUrl, altTxt, price);
+  });
+}; // Fin fonction listener
 
-    if(colors === ""){ // Si il n'y a pas de couleur de selectionné
-      alert("Veuillez selectionner une couleur");
-    }
-    else if(quantity <=0 || quantity >100){ // Si l'utilisateur a saisi une quantité incorrect
-      alert("Veuillez ajouter une quantité correct");
-    }
-    else{
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!! Fonction recoveryData !!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!! récupération des différentes données !!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      //Fonction pour créer le LocalStorage du Panier
-      function createLocalStorage(){
-        let product = { // Objet contenant les données du produit
-          idProduct : id,
-          titleProduct : title,
-          imgSrcProduct : imgSrc,
-          imgAltProduct : imgAlt,
-          colorsProduct : colors,
-          quantityProduct : quantity,
-          priceProduct : price
-        }; // Fin Objet product
+function recoveryData(name, imageUrl, altTxt, price){
+  let colors = document.getElementById('colors').value;
+  let quantityFloat = document.getElementById('quantity').value;
+  let quantity = parseInt(quantityFloat); // Transformation de la quantité en INT au cas ou l'utilisateur saisirait un chiffre à virgule
+  
+  verifForm(name, imageUrl, altTxt, price, colors, quantity);
+}; // Fin fonction recoveryData;
 
-        //Chargement du Local Storage 
-        let localStorageInformation = JSON.parse(localStorage.getItem('products'));
-        //Fonction pour ajouter le localStorage si il n'existe pas 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!! Fonction verifForm !!!!!!!!!!!!!!!!!!!!!!
+// !!!! vérification des données entrées par l'utilisateur !!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        if(localStorageInformation){ // On vérifi si un localStorage existe
+function verifForm(name, imageUrl, altTxt, price, colors, quantity){
+  if(colors === ""){
+    console.log("Veuillez choisir une couleur");
+  }
+  else if(quantity <= 0){
+    console.log("Veuillez saisir une quantité");
+  }
+  else if(quantity > 100){
+    console.log("Veuillez saisir une quantité inférieur à 100");
+  }
+  else{
+    initLocalStorage(name, imageUrl, altTxt, price, colors, quantity);
+  }
+}; // Fin fonction verifForm
 
-          for(let i = 0; i < localStorageInformation.length; i++){ // Boucle qui parcourt le Local Storage
-            // Si le canapé avec la même couleur est déja dans le panier, on augmente la quantité
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!! Fonction initLocalStorage !!!!!!!!!!!!!!!!!!!
+// !!!!! Initie le Local Storage et vérifie son existance !!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            if(id === localStorageInformation[i].idProduct){
-              if(colors === localStorageInformation[i].colorsProduct){
-                localStorageInformation[i].quantityProduct += quantity;
-                localStorage.setItem('products', JSON.stringify(localStorageInformation));
-                break;
-              }
-              else{
-                localStorageInformation.push(product);
-                localStorage.setItem('products', JSON.stringify(localStorageInformation));
-                break;
-              }
-            }
-            // Sinon on ajoute au panier existant
-            else{
-              localStorageInformation.push(product);
-              localStorage.setItem('products', JSON.stringify(localStorageInformation));
-              break; // On arrête la fonction car la suite n'est pas nécessaire
-            }
-          } // Fin boucle for
-        } // Fin If verif existence Local Storage
+function initLocalStorage(name, imageUrl, altTxt, price, colors, quantity){
+  let product = { // Objet contenant les données du produit
+    id : id,
+    name : name,
+    imageUrl : imageUrl,
+    altTxt : altTxt,
+    colors : colors,
+    quantity : quantity,
+    price : price
+  }; // Fin Objet product
 
-        // Si aucun local Storage existe on le créé
-        else{
+  let localStorageInformation = JSON.parse(localStorage.getItem('products'));
+
+  if(localStorageInformation){
+    verifIdAndColors(product, localStorageInformation);
+  }
+  else {
+    createLocalStorage(product, localStorageInformation);
+  }
+}; // Fin fonction initLocalStorage
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!! Fonction createLocalStorage !!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!! créer le Local Storage !!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+function createLocalStorage(product){
+  console.log("Aucun Local Storage n'existe, création");
           let localStorageInformation = [];
           localStorageInformation.push(product);
           localStorage.setItem('products', JSON.stringify(localStorageInformation));
-        }
-      }; // Fin Fonction createLocalStorage
-      // Lancement de la fonction
-      createLocalStorage();
-      
-      
-    } // Fin Else (si couleur et quantité ok)
-    
-  }); // Fin de fonction click 
-}; // Fin de la fonction add cart
-      
+          console.log(localStorageInformation);
+}; // Fin fonction createLocalStorage
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!! Fonction verifIdAndColors !!!!!!!!!!!!!!!!!!!
+// !!! vérifier si le canapé est déjà dans le Local Storage !!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+function verifIdAndColors(product, localStorageInformation){
+  localStorageInformation.forEach(products =>{
+    if((product.id === products.id) && (product.colors === products.colors)){
+      modifQuantity(localStorageInformation, products, product);
+    }
+    else{
+      addLocalStorage(product, localStorageInformation);
+    }
+  }); // Fin Foreach
+}; // Fin Fonction verifIdAndColors
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!! Fonction modifQuantity !!!!!!!!!!!!!!!!!!!!!
+// !!!!! Modification de la quantité dans le Local Storage !!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+function modifQuantity(localStorageInformation, products, product){
+  console.log("un canapé avec le même id et la même couleur est déjà dans le Local Storage, changement de la quantité");
+  products.quantity += product.quantity;
+  localStorage.setItem('products', JSON.stringify(localStorageInformation));
+  console.log(localStorageInformation);
+}; // Fin fonction modifQuantity
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!! Fonction addLocalStorage !!!!!!!!!!!!!!!!!!!!
+// !!!!!! ajoute le canapé au localStorage déjà existant !!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+function addLocalStorage(product, localStorageInformation){
+  console.log("un canapé avec le même id est déjà dans le local Storage, mais il n'a pas la même couleur");
+  localStorageInformation.push(product);
+  localStorage.setItem('products', JSON.stringify(localStorageInformation));
+}; // Fin de la fonction addLocalStorage
