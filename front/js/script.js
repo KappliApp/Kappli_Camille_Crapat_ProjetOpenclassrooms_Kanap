@@ -1,14 +1,17 @@
-// Connexion API
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!! Fetch !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!! Récupération des données des canapés et affichage !!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 fetch("http://localhost:3000/api/products")
-  .then(function(res) {
+  .then(function(res) { // Vérification s'il existe des données
     if (res.ok) {
       return res.json();
     }
   })
-  // Récupération et affichage des résultats
-  .then(function(resultats) {
+  .then(function(resultats) { // Fonction récupérant les données 
     let selectItems = document.getElementById('items');
-    for(i = 0; i < resultats.length; i++){
+    for(i = 0; i < resultats.length; i++){ // Boucle pour afficher tous les produits
       let HTML = `
       <a href="./product.html?id=${resultats[i]._id}">
             <article>

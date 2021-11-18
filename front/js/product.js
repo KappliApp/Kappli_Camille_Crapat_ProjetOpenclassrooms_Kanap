@@ -40,7 +40,7 @@ fetch("http://localhost:3000/api/products/" + id)
         colorsHTML.innerHTML += `<option value="${resultats.colors[i]}">${resultats.colors[i]}</option>`;
     }
 
-    listener(resultats.name, resultats.imageUrl, resultats.altTxt, resultats.price); // 
+    listener(resultats.name, resultats.imageUrl, resultats.altTxt, resultats.price); // Chargement de la fonction listener 
     
 
   })
@@ -63,10 +63,10 @@ fetch("http://localhost:3000/api/products/" + id)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 function listener(name, imageUrl, altTxt, price){
-  document.getElementById('addToCart').addEventListener('click', function(e){
+  document.getElementById('addToCart').addEventListener('click', function(e){ // Ecoute d'un clique sur le boutton ajouter au panier 
     e.preventDefault();
 
-    recoveryData(name, imageUrl, altTxt, price);
+    recoveryData(name, imageUrl, altTxt, price); // Chargement de la fonction recoveryData
   });
 }; // Fin fonction listener
 
@@ -80,7 +80,7 @@ function recoveryData(name, imageUrl, altTxt, price){
   let quantityFloat = document.getElementById('quantity').value;
   let quantity = parseInt(quantityFloat); // Transformation de la quantité en INT au cas ou l'utilisateur saisirait un chiffre à virgule
   
-  verifForm(name, imageUrl, altTxt, price, colors, quantity);
+  verifForm(name, imageUrl, altTxt, price, colors, quantity); // Chargement de la fonction verifForm
 }; // Fin fonction recoveryData;
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -89,16 +89,16 @@ function recoveryData(name, imageUrl, altTxt, price){
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 function verifForm(name, imageUrl, altTxt, price, colors, quantity){
-  if(colors === ""){
+  if(colors === ""){ // Si il n'y a pas de couleur de selectionnée, on affiche un message
     console.log("Veuillez choisir une couleur");
   }
-  else if(quantity <= 0){
+  else if(quantity <= 0){ // Si la quantité est inférieur ou égale à 0, on affiche un message 
     console.log("Veuillez saisir une quantité");
   }
-  else if(quantity > 100){
+  else if(quantity > 100){ // Si la quantité est supérieur à 100, on affiche un message d'erreur
     console.log("Veuillez saisir une quantité inférieur à 100");
   }
-  else{
+  else{ // Sinon on charge la fonction initLocalStorage
     initLocalStorage(name, imageUrl, altTxt, price, colors, quantity);
   }
 }; // Fin fonction verifForm
@@ -119,12 +119,12 @@ function initLocalStorage(name, imageUrl, altTxt, price, colors, quantity){
     price : price
   }; // Fin Objet product
 
-  let localStorageInformation = JSON.parse(localStorage.getItem('products'));
+  let localStorageInformation = JSON.parse(localStorage.getItem('products')); // Chargement du local Storage s'il est déjà existant
 
-  if(localStorageInformation){
+  if(localStorageInformation){ // Si le local storage est existant, on charge la fonction verifIdAndColors
     verifIdAndColors(product, localStorageInformation);
   }
-  else {
+  else { // Sinon, on charge la fonction createLocalStorage
     createLocalStorage(product, localStorageInformation);
   }
 }; // Fin fonction initLocalStorage
@@ -136,9 +136,9 @@ function initLocalStorage(name, imageUrl, altTxt, price, colors, quantity){
 
 function createLocalStorage(product){
   console.log("Aucun Local Storage n'existe, création");
-          let localStorageInformation = [];
-          localStorageInformation.push(product);
-          localStorage.setItem('products', JSON.stringify(localStorageInformation));
+          let localStorageInformation = []; // Initialisation de la variable localStorageInformation en tableau
+          localStorageInformation.push(product); // Ajout du produit au tableau
+          localStorage.setItem('products', JSON.stringify(localStorageInformation)); // Mise à jour du local storage
           console.log(localStorageInformation);
 }; // Fin fonction createLocalStorage
 
@@ -148,11 +148,11 @@ function createLocalStorage(product){
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 function verifIdAndColors(product, localStorageInformation){
-  localStorageInformation.forEach(products =>{
-    if((product.id === products.id) && (product.colors === products.colors)){
+  localStorageInformation.forEach(products =>{ // Boucle Foreach
+    if((product.id === products.id) && (product.colors === products.colors)){ // Si l'id et la couleur sont identiques, on charge la fonction modifQuantity
       modifQuantity(localStorageInformation, products, product);
     }
-    else{
+    else{ // Sinon, on charge la fonction addLocalStorage
       addLocalStorage(product, localStorageInformation);
     }
   }); // Fin Foreach
@@ -165,8 +165,8 @@ function verifIdAndColors(product, localStorageInformation){
 
 function modifQuantity(localStorageInformation, products, product){
   console.log("un canapé avec le même id et la même couleur est déjà dans le Local Storage, changement de la quantité");
-  products.quantity += product.quantity;
-  localStorage.setItem('products', JSON.stringify(localStorageInformation));
+  products.quantity += product.quantity; // Incrémentation de la quantité
+  localStorage.setItem('products', JSON.stringify(localStorageInformation)); // Mise à jour du local storage
   console.log(localStorageInformation);
 }; // Fin fonction modifQuantity
 
@@ -177,6 +177,7 @@ function modifQuantity(localStorageInformation, products, product){
 
 function addLocalStorage(product, localStorageInformation){
   console.log("un canapé avec le même id est déjà dans le local Storage, mais il n'a pas la même couleur");
-  localStorageInformation.push(product);
-  localStorage.setItem('products', JSON.stringify(localStorageInformation));
+  localStorageInformation.push(product); // Ajout au tableau local storage
+  localStorage.setItem('products', JSON.stringify(localStorageInformation)); // Mise à jour du local storage
+  console.log(localStorageInformation);
 }; // Fin de la fonction addLocalStorage

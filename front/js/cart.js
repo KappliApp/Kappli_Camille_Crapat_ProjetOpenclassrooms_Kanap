@@ -65,4 +65,87 @@ function calculate(localStorageInformation){ // Fonction permettant de calculer 
   document.getElementById('totalPrice').innerHTML += priceTotal;
   document.getElementById('totalQuantity').innerHTML += quantityTotal;
 }; // Fin de fonction de calcul 
-   
+
+
+function regexText(nameInput, value){
+  if(!value){
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "block";
+    HTML.innerHTML = 'Veuillez saisir une valeur !';
+  }
+  else if(!/^[-a-zA-ZàâäéèêëïîôöùûüçÂ]{2,20}$/.test(value)){
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "block";
+    HTML.innerHTML = 'Veuillez saisir une valeur correct !';
+  }
+  else{
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "none";
+  }
+};
+
+function regexMail(nameInput, value){
+  if(!value){
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "block";
+    HTML.innerHTML = 'Veuillez saisir une valeur !';
+  }
+  else if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)){
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "block";
+    HTML.innerHTML = 'Veuillez saisir une valeur correct !';
+  }
+  else{
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "none";
+  }
+};
+
+function regexAdress(nameInput, value){
+  if(!value){
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "block";
+    HTML.innerHTML = 'Veuillez saisir une valeur !';
+  }
+  else if(!/^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/.test(value)){
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "block";
+    HTML.innerHTML = 'Veuillez saisir une valeur correct !';
+  }
+  else{
+    let HTML = document.getElementById(nameInput + 'ErrorMsg')
+    HTML.style.display = "none";
+  }
+};
+
+
+document.getElementById('firstName').addEventListener('input', function(e){
+  regexText('firstName', e.target.value);
+});
+document.getElementById('lastName').addEventListener('input', function(e){
+  regexText('lastName', e.target.value);
+});
+document.getElementById('address').addEventListener('input', function(e){
+  regexAdress('address', e.target.value);
+});
+document.getElementById('city').addEventListener('input', function(e){
+  regexText('city', e.target.value);
+});
+document.getElementById('email').addEventListener('input', function(e){
+  regexMail('email', e.target.value);
+});
+
+
+document.getElementById('order').addEventListener('click', function(e){
+  e.preventDefault();
+
+  let contact = {
+    firstName : document.getElementById('firstName').value,
+    lastName : document.getElementById('lastName').value,
+    adress : document.getElementById('address').value,
+    city : document.getElementById('city').value,
+    email : document.getElementById('email').value
+  };
+
+  localStorage.setItem('contacts', JSON.stringify(contact));
+});
