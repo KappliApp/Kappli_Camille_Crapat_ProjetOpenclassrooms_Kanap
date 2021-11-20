@@ -24,11 +24,16 @@ if(localStorageInformation){
   </article>`;
   document.getElementById('cart__items').innerHTML += HTML;
 
-  document.querySelector('.itemQuantity').addEventListener('input', function(e){
-    console.log('test');
-  })
+  
 
 } // Fin boucle for affichage localStorage
+
+let itemQuantity = document.getElementsByClassName('itemQuantity');
+for(i=0; i < itemQuantity.length; i++){
+  itemQuantity[i].addEventListener('change', function(e){
+    console.log("test");
+  })
+}
 
 calculate(localStorageInformation);
 
