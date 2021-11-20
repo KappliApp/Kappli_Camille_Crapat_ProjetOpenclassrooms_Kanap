@@ -90,13 +90,13 @@ function recoveryData(name, imageUrl, altTxt, price){
 
 function verifForm(name, imageUrl, altTxt, price, colors, quantity){
   if(colors === ""){ // Si il n'y a pas de couleur de selectionnée, on affiche un message
-    console.log("Veuillez choisir une couleur");
+    alert("Veuillez choisir une couleur");
   }
   else if(quantity <= 0){ // Si la quantité est inférieur ou égale à 0, on affiche un message 
-    console.log("Veuillez saisir une quantité");
+    alert("Veuillez saisir une quantité");
   }
   else if(quantity > 100){ // Si la quantité est supérieur à 100, on affiche un message d'erreur
-    console.log("Veuillez saisir une quantité inférieur à 100");
+    alert("Veuillez saisir une quantité inférieur à 100");
   }
   else{ // Sinon on charge la fonction initLocalStorage
     initLocalStorage(name, imageUrl, altTxt, price, colors, quantity);
