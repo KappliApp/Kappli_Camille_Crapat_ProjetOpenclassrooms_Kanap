@@ -1,101 +1,89 @@
 let localStorageInformation = JSON.parse(localStorage.getItem('products')); // Récupération du local Storage 
 
-if(localStorageInformation){
-  if(localStorageInformation.length !== 0){
-    displayCart(localStorageInformation); // Affichage du panier
-    changeQuantity(localStorageInformation); // Ecoute si un changement de quantité se passe
-    deleteItem(localStorageInformation); // Ecoute si une suppression survient
-    calculate(localStorageInformation); // Calcule la quantité et le prix totale
-    verifRegex(localStorageInformation); // Formulaire
+verifLocalStorage(localStorageInformation);
+
+function verifLocalStorage(localStorageInformation){
+  if(localStorageInformation){ // Si un local Storage existe
+    if(localStorageInformation.length !== 0){ // Si il est plein
+      displayCart(localStorageInformation); // Affichage du panier
+      changeQuantity(localStorageInformation); // Ecoute si un changement de quantité se passe
+      deleteItem(localStorageInformation); // Ecoute si une suppression survient
+      calculate(localStorageInformation); // Calcule la quantité et le prix totale
+      verifRegex(localStorageInformation); // Formulaire
+    }
+    else{ // Sinon on affiche panier vide
+      displayError();
+    }
   }
-  else{
-    displayError();
+  else{ // Si le local Storage est vide
+      displayError(); // Affichage panier vide
   }
 }
-else{ // Si le local Storage est vide
-    displayError(); // Affichage panier vide
-}
 
 
 
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!! Fonction verifRegex !!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!! Vérification du formulaire !!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-
-  
 function verifRegex(localStorageInformation){
-  document.getElementById('firstName').addEventListener('input', function(e){
-    regexText('firstName', e.target.value);
-  });
-  document.getElementById('lastName').addEventListener('input', function(e){
-    regexText('lastName', e.target.value);
-  });
-  document.getElementById('address').addEventListener('input', function(e){
-    regexAdress('address', e.target.value);
-  });
-  document.getElementById('city').addEventListener('input', function(e){
-    regexText('city', e.target.value);
-  });
-  document.getElementById('email').addEventListener('input', function(e){
-    regexMail('email', e.target.value);
-  });
-  recoveryContact(localStorageInformation);
+  const regexText = /^[-a-zA-ZàâäéèêëïîôöùûüçÂ]{2,20}$/; // Regex pour les nom, prénom et ville 
+  const regexAddress = /^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/; // Regex pour les addresses
+  const regexMail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; // Regex pour l'adresse mail
 
-  function regexText(nameInput, value){
-    if(!value){
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "block";
-      HTML.innerHTML = 'Veuillez saisir une valeur !';
-    }
-    else if(!/^[-a-zA-ZàâäéèêëïîôöùûüçÂ]{2,20}$/.test(value)){
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "block";
-      HTML.innerHTML = 'Veuillez saisir une valeur correct !';
-    }
-    else{
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "none";
-    }
-  };
-  
-  function regexMail(nameInput, value){
-    if(!value){
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "block";
-      HTML.innerHTML = 'Veuillez saisir une valeur !';
-    }
-    else if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)){
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "block";
-      HTML.innerHTML = 'Veuillez saisir une valeur correct !';
-    }
-    else{
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "none";
-    }
-  };
-  
-  function regexAdress(nameInput, value){
-    if(!value){
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "block";
-      HTML.innerHTML = 'Veuillez saisir une valeur !';
-    }
-    else if(!/^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/.test(value)){
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "block";
-      HTML.innerHTML = 'Veuillez saisir une valeur correct !';
-    }
-    else{
-      let HTML = document.getElementById(nameInput + 'ErrorMsg')
-      HTML.style.display = "none";
-    }
-  };
-}
+  inputRegex('firstName', 'input', regexText); // Vérification prénom
+  inputRegex('lastName', 'input', regexText); // Vérification nom
+  inputRegex('address', 'input', regexAddress); // Vérification adresse
+  inputRegex('city', 'input', regexText); // Vérification ville
+  inputRegex('email', 'input', regexMail); // Vérification email
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!! Fonction inputRegex !!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!! Vérification du formulaire !!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  function inputRegex(id, type, regexType){
+    document.getElementById(id).addEventListener(type, function(e){ // lors d'une modification d'un input
+      regex(id, e.target.value, regexType); // Chargement fonction regex
+    });
+  }; // Fin fonction inputRegex
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!! Fonction regex !!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!! Vérification du formulaire !!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  function regex(nameInput, value, regex){
+    let HTML = document.getElementById(nameInput + 'ErrorMsg'); // Selection de l'emplacement des erreurs
+    let button = document.getElementById('order'); // Selection du boutton
+    if(!value){ // Si il n'y a aucune valeur
+      HTML.style.display = "block"; // Affichage du message d'erreur
+      button.setAttribute('disabled', 'disabled'); // Désactivation du boutton
+      HTML.innerHTML = 'Veuillez saisir une valeur !';
+    }
+    else if(!regex.test(value)){ // Si la valeur est différente du regex 
+      HTML.style.display = "block"; // Affichage du message d'erreur
+      button.setAttribute('disabled', 'disabled'); // Désactivation du boutton
+      HTML.innerHTML = 'Veuillez saisir une valeur correct !';
+    }
+    else{ // Sinon
+      HTML.style.display = "none"; // Suppression du message d'erreur 
+      button.removeAttribute('disabled'); // Réactivation du boutton
+    }
+
+  }; // Fin fonction regex
+  recoveryContact(localStorageInformation); // Initialisation de la fonction recoveryContact
+}; // Fin fonction verifRegex
+  
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!! Fonction recoveryContact !!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!! Récupération données utilisateur !!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 function recoveryContact (localStorageInformation){
-  document.getElementById('order').addEventListener('click', function(e){
+  document.getElementById('order').addEventListener('click', function(e){ // Au clic sur le boutton
   e.preventDefault();
     let firstName = document.getElementById('firstName').value;
     let lastName = document.getElementById('lastName').value;
@@ -103,8 +91,8 @@ function recoveryContact (localStorageInformation){
     let city = document.getElementById('city').value;
     let email = document.getElementById('email').value;
 
-    if((firstName) && (lastName) && (address) && (city) && (email)){
-      let contact = {
+    if((firstName) && (lastName) && (address) && (city) && (email)){ // Si toutes les données sont présentes 
+      let contact = { // Création de l'objet contact
         firstName : firstName,
         lastName : lastName,
         address : address,
@@ -114,19 +102,29 @@ function recoveryContact (localStorageInformation){
       collectIdLocalStorage(localStorageInformation, contact);
       
     }
-    else{
+    else{ // Sinon on affiche un message d'erreur
       alert("Vous n'avez pas saisie un champs");
     }
   });
 };
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!! Fonction collectIdLocalStorage !!!!!!!!!!!!!!!!
+// !!!!!!!! Tableau id des produits dans LocalStorage !!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 function collectIdLocalStorage(localStorageInformation, contact){
-  let products = [];
-  for(i=0; i < localStorageInformation.length; i++){
-    products.push(localStorageInformation[i].id);
-  } 
-  sendData(products, contact)
+  let products = []; // Initialisation tableau products
+  for(i=0; i < localStorageInformation.length; i++){ // Boucle qui parcourt le Local Storage
+    products.push(localStorageInformation[i].id); // Ajout des Ids
+  }  // Fin boucle
+  sendData(products, contact) // Fonction envoie des données
 }
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!! Fonction sendData !!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!! Envoi des données vers l'API !!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 function sendData (products, contact){
   const body = {
@@ -151,7 +149,15 @@ function sendData (products, contact){
     window.location.href='./confirmation.html?id='+id
   })
 .catch(function (err) {
-  console.log("fetch Error");
+  let error = document.getElementById('cart__items');
+  error.innerHTML = `<p>Une erreur est survenu lors du passage de la commande</p>`
+  error.style.textAlign = "center";
+  error.style.fontSize = "18px";
+  error.style.color = "white";
+  error.style.fontWeight = "bold";
+  error.style.borderRadius = "10px";
+  error.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+  error.style.lineHeight = "30px";
 });
 }
 
@@ -244,7 +250,7 @@ function deleteItem(localStorageInformation){
       localStorage.setItem('products', JSON.stringify(localStorageInformation)); // On met à jour le LocalStorage
       calculate(localStorageInformation); // On recalcule la quantité et le prix totale
       if(localStorageInformation.length === 0){ // Si il n'y a plus d'article 
-        displayError(); // On affiche que le panier est vide
+        verifLocalStorage(localStorageInformation); // On affiche que le panier est vide
       }
     }); // Fin fonction click
   }); // Fin foreach

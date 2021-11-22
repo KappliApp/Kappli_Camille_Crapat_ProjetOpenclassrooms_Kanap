@@ -149,17 +149,16 @@ function createLocalStorage(product){
 
 function verifIdAndColors(product, localStorageInformation){
   let verif = false;
-  localStorageInformation.forEach(products =>{ // Boucle Foreach
+  localStorageInformation.forEach(function (products){ // Boucle Foreach
     if((product.id === products.id) && (product.colors === products.colors)){ // Si l'id et la couleur sont identiques, on charge la fonction modifQuantity
       modifQuantity(localStorageInformation, products, product);
       verif = true;
-    }
-    else{ // Sinon, on charge la fonction addLocalStorage
-      verif = false;
+      return;
     }
   }); // Fin Foreach
   if(verif === false){
     addLocalStorage(product, localStorageInformation);
+    return;
   }
 }; // Fin Fonction verifIdAndColors
 
