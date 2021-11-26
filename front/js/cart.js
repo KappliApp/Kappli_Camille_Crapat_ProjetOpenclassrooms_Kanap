@@ -58,10 +58,10 @@ function verifRegex(localStorageInformation){
     }
     else{ // Sinon
       HTML.style.display = "none"; // Suppression du message d'erreur 
-      recoveryContact(localStorageInformation);
         }
 
   }; // Fin fonction regex
+  recoveryContact(localStorageInformation);
 }; // Fin fonction verifRegex
   
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -78,8 +78,15 @@ function recoveryContact (localStorageInformation){
     let city = document.getElementById('city').value;
     let email = document.getElementById('email').value;
 
+    const regexText = /^[-a-zA-ZàâäéèêëïîôöùûüçÂ]{2,20}$/; // Regex pour les nom, prénom et ville 
+    const regexAddress = /^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+/; // Regex pour les addresses
+    const regexMail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; // Regex pour l'adresse mail
+
     if((!firstName) || (!lastName) || (!address) || (!city) || (!email)){
-      alert("Vous n'avez pas saisie une champs")
+      alert("Vous n'avez pas saisie un champs")
+    }
+    else if((!regexText.test(firstName)) || (!regexText.test(lastName)) || (!regexAddress.test(address)) || (!regexText.test(city)) || (!regexMail.test(email))){
+      alert("Vous avez mal saisie un champs");
     }
     else if((!localStorageInformation) || (localStorageInformation.length === 0)){
       alert("Votre panier est vide")
@@ -218,7 +225,7 @@ function changeQuantity(localStorageInformation){
     item.addEventListener('change', function(){ // Au changement d'une quantité
       localStorageInformation[index].quantity = parseInt(itemQuantity[index].value); // On change la quantité
       localStorage.setItem('products', JSON.stringify(localStorageInformation)); // On met à jour le localStorage
-      calculate(localStorageInformation); // On recalcule le prix et la quantité totale
+      calculate(); // On recalcule le prix et la quantité totale
     }); // Fin fonction click
   }); // Fin foreach
 }; // Fin fonction changeQuantity
@@ -237,7 +244,7 @@ function deleteItem(localStorageInformation){
 
       localStorageInformation.splice(index, 1); // On le supprime du localStorage
       localStorage.setItem('products', JSON.stringify(localStorageInformation)); // On met à jour le LocalStorage
-      calculate(localStorageInformation); // On recalcule la quantité et le prix totale
+      calculate(); // On recalcule la quantité et le prix totale
       if((!localStorageInformation) || (localStorageInformation.length == 0)){ // Si il n'y a plus d'article 
         displayError(); // On affiche que le panier est vide
       }
@@ -250,12 +257,13 @@ function deleteItem(localStorageInformation){
 // !!!!!! Permet de calculer la quantité et le prix total !!!!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-function calculate(localStorageInformation){ 
+function calculate(){ 
+  let localStorageReload = JSON.parse(localStorage.getItem('products'))
   let quantityTotal = 0; 
   let priceTotal = 0;
-  for(i=0; i < localStorageInformation.length; i++){ // Boucle qui parcourt le Local Storage
-    quantityTotal += localStorageInformation[i].quantity; // Calcul de la quantité total
-    priceTotal += localStorageInformation[i].price * localStorageInformation[i].quantity; // Calcul du prix total
+  for(i=0; i < localStorageReload.length; i++){ // Boucle qui parcourt le Local Storage
+    quantityTotal += localStorageReload[i].quantity; // Calcul de la quantité total
+    priceTotal += localStorageReload[i].price * localStorageReload[i].quantity; // Calcul du prix total
   }
   document.getElementById('totalPrice').innerHTML = priceTotal; // Affichage du prix total
   document.getElementById('totalQuantity').innerHTML = quantityTotal; // Affichage de la quantité total
