@@ -1,24 +1,15 @@
 let localStorageInformation = JSON.parse(localStorage.getItem('products')); // Récupération du local Storage 
 
-verifLocalStorage(localStorageInformation);
-
-function verifLocalStorage(localStorageInformation){
-  if(localStorageInformation){ // Si un local Storage existe
-    if(localStorageInformation.length !== 0){ // Si il est plein
+  if((localStorageInformation) && (localStorageInformation.length !== 0)){ // Si un local Storage existe
       displayCart(localStorageInformation); // Affichage du panier
       changeQuantity(localStorageInformation); // Ecoute si un changement de quantité se passe
       deleteItem(localStorageInformation); // Ecoute si une suppression survient
       calculate(localStorageInformation); // Calcule la quantité et le prix totale
-      verifRegex(localStorageInformation); // Formulaire
-    }
-    else{ // Sinon on affiche panier vide
-      displayError();
-    }
   }
   else{ // Si le local Storage est vide
       displayError(); // Affichage panier vide
   }
-}
+  verifRegex(localStorageInformation); // Formulaire
 
 
 
@@ -57,24 +48,20 @@ function verifRegex(localStorageInformation){
 
   function regex(nameInput, value, regex){
     let HTML = document.getElementById(nameInput + 'ErrorMsg'); // Selection de l'emplacement des erreurs
-    let button = document.getElementById('order'); // Selection du boutton
     if(!value){ // Si il n'y a aucune valeur
       HTML.style.display = "block"; // Affichage du message d'erreur
-      button.setAttribute('disabled', 'disabled'); // Désactivation du boutton
       HTML.innerHTML = 'Veuillez saisir une valeur !';
     }
     else if(!regex.test(value)){ // Si la valeur est différente du regex 
       HTML.style.display = "block"; // Affichage du message d'erreur
-      button.setAttribute('disabled', 'disabled'); // Désactivation du boutton
       HTML.innerHTML = 'Veuillez saisir une valeur correct !';
     }
     else{ // Sinon
       HTML.style.display = "none"; // Suppression du message d'erreur 
-      button.removeAttribute('disabled'); // Réactivation du boutton
-    }
+      recoveryContact(localStorageInformation);
+        }
 
   }; // Fin fonction regex
-  recoveryContact(localStorageInformation); // Initialisation de la fonction recoveryContact
 }; // Fin fonction verifRegex
   
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -91,7 +78,13 @@ function recoveryContact (localStorageInformation){
     let city = document.getElementById('city').value;
     let email = document.getElementById('email').value;
 
-    if((firstName) && (lastName) && (address) && (city) && (email)){ // Si toutes les données sont présentes 
+    if((!firstName) || (!lastName) || (!address) || (!city) || (!email)){
+      alert("Vous n'avez pas saisie une champs")
+    }
+    else if((!localStorageInformation) || (localStorageInformation.length === 0)){
+      alert("Votre panier est vide")
+    }
+    else {
       let contact = { // Création de l'objet contact
         firstName : firstName,
         lastName : lastName,
@@ -100,10 +93,6 @@ function recoveryContact (localStorageInformation){
         email : email
       };
       collectIdLocalStorage(localStorageInformation, contact);
-      
-    }
-    else{ // Sinon on affiche un message d'erreur
-      alert("Vous n'avez pas saisie un champs");
     }
   });
 };
@@ -249,8 +238,8 @@ function deleteItem(localStorageInformation){
       localStorageInformation.splice(index, 1); // On le supprime du localStorage
       localStorage.setItem('products', JSON.stringify(localStorageInformation)); // On met à jour le LocalStorage
       calculate(localStorageInformation); // On recalcule la quantité et le prix totale
-      if(localStorageInformation.length === 0){ // Si il n'y a plus d'article 
-        verifLocalStorage(localStorageInformation); // On affiche que le panier est vide
+      if((!localStorageInformation) || (localStorageInformation.length == 0)){ // Si il n'y a plus d'article 
+        displayError(); // On affiche que le panier est vide
       }
     }); // Fin fonction click
   }); // Fin foreach
