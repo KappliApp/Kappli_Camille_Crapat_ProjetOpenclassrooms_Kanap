@@ -9,13 +9,13 @@ let id = url.searchParams.get("id");
 // !!!!! Récupération des données du canapé et affichage !!!!!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-fetch("http://localhost:3000/api/products/" + id)
+fetch("https://kanap-api.kappli.eu/api/products/" + id)
 .then(function(res) {
     if (res.ok) { // Vérification si des résultats sont présents
       return res.json();
     }
   })
-  .then(function(resultats, id) { // Fonction récupérant les données 
+  .then(function(resultats) { // Fonction récupérant les données 
       
     //Affichage informations produit
 

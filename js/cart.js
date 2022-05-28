@@ -123,26 +123,28 @@ function collectIdLocalStorage(localStorageInformation, contact){
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 function sendData (products, contact){
-  const body = {
+  const body = { // Données
     products : products,
     contact : contact
   };
-  const option = {
+  const option = { // Options
     method: "POST",
     headers : {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(body)
   };
-  fetch('http://localhost:3000/api/products/order', option)
+  fetch('https://kanap-api.kappli.eu/api/products/order', option) // Envoyer données
   .then(function(res) {
     if (res.ok) { // Vérification si des résultats sont présents
       return res.json();
     }
   })
   .then(function(data){
-    let id = data.orderId;
-    window.location.href='./confirmation.html?id='+id
+    let newLocalStorage = []; 
+    localStorage.setItem('products', JSON.stringify(newLocalStorage)); // Vider le Local Storage
+    let id = data.orderId; // Récupération de l'id
+    window.location.href='./confirmation.html?id='+id // Redirection vers la page confirmation
   })
 .catch(function (err) {
   let error = document.getElementById('cart__items');
